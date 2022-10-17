@@ -280,7 +280,6 @@
                     $(formMessages).text('Oops! An error occured and your message could not be sent.');
                 }
             });
-
         });
     });
 })(jQuery);
