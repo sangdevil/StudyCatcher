@@ -173,7 +173,10 @@
 
     // 9. wow animation  active
     // ---------------------------------------------------------------------------
-    new WOW().init();
+    // new WOW().init();
+    setTimeout(function() {
+        new WOW().init();
+    }, 100)
 
 
 
