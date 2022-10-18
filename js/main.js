@@ -17,16 +17,16 @@
 
     // 1. sticky menu
     // ---------------------------------------------------------------------------
-    // var wind = $(window);
-    // var sticky = $("#header-sticky");
-    // wind.on('scroll', function () {
-    //     var scroll = $(wind).scrollTop();
-    //     if (scroll < 2) {
-    //         sticky.removeClass("sticky-menu");
-    //     } else {
-    //         // $("#header-sticky").addClass("sticky-menu");
-    //     }
-    // });
+    var wind = $(window);
+    var sticky = $("#header-sticky");
+    wind.on('scroll', function () {
+        var scroll = $(wind).scrollTop();
+        if (scroll < 2) {
+            sticky.removeClass("sticky-menu");
+        } else {
+            $("#header-sticky").addClass("sticky-menu");
+        }
+    });
 
     // 2. slider - active
     //---------------------------------------------------------------------------
