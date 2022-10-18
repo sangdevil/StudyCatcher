@@ -285,6 +285,12 @@
             });
         });
     });
+
+    $(".whitepaperopenblank").click(function(evt){
+        evt.preventDefault();
+        evt.stopPropagation();
+        window.open("https://dreamladders.gitbook.io/edu-metacore-whitepaper/", '_blank').focus();
+    });
 })(jQuery);
 
 
