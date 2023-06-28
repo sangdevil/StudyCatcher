@@ -11394,10 +11394,10 @@ hr.divider-light {
 
 
 .video-container {
-  width: 450px; /* Set the width of the video container */
+  width: 100%; /* Set the width of the video container */
   height: 420px; /* Set the height of the video container */
   background-image: url("../images/screen.png");
-  background-size: 450px 420px;
+  background-size: 100% 100%;
   background-repeat: no-repeat;
   background-position: center;
   position: relative; /* Set the position of the video container to relative */
@@ -11518,6 +11518,7 @@ hr.divider-light {
 	align-items: center;
 }
 
+
 #pop-video-container {
 	width: 50%;
 	height: 100%;
@@ -11607,7 +11608,8 @@ hr.divider-light {
 
 .text-pop-small{
   font-family: "consolas";
-  font-size: 20px;
+  font-size: 18px;
+  color:gray;
 }
 
 .text-pop-small-fail{

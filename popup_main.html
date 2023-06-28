@@ -1,72 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Study Catcher</title>
-    <link rel="stylesheet" href="./css/popup_style.css">
-</head>
-<body>
-<div class="container-fluid">
-    <div class="row justify-content-start">
+    <link rel="stylesheet" href="./css/popup_style.css" />
+  </head>
+  <body>
+    <div class="container-fluid">
+      <div class="row justify-content-start">
         <div class="col-md-12">
-            <br>
-            <h1 class = "text-pop-big" >&nbsp START</h1>
+          <br />
+          <h1 class="text-pop-big">&nbsp START</h1>
         </div>
-    </div>
-    <div class="row gx-4 gx-lg-5 justify-content-center">
+      </div>
+      <div class="row gx-4 gx-lg-5 justify-content-center">
         <div class="col-md-6">
-            <div class="container">
-                <br>
-                <div class="row">
-                    <div class="col">
-                        &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-                        <div class="circle circle-red">
-                          <span class="circle-text">녹화중</span>
-                        </div>
-                    </div>
-
-                      
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <div id="video-container">
-                            <!-- Your webcam video goes here -->
-                            <video id="video_main" autoplay></video>
-                        </div>
-                        <div id="button-container-ready">
-                            <button class="custom-btn custom-btn-pause me-3" id = "button-pause">
-                            </button>
-                            &nbsp&nbsp&nbsp
-                            <button class="custom-btn custom-btn-start me-3" id = "button-start-main">
-                            </button>
-                            &nbsp&nbsp&nbsp
-                            <button class="custom-btn custom-btn-stop" id = "button-stop">
-                            </button>
-                        </div>
-                        
-                    </div>
-                </div>
-
-            </div>
-        </div>
-        <div class="col-md-6">
-            <br><br>
-            <div class="container">
+          <div class="container">
+            <br />
             <div class="row">
-                <div class="col">
-
-
+              <div class="col">
+                &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+                <div class="circle circle-red">
+                  <span class="circle-text">녹화중</span>
                 </div>
+              </div>
             </div>
+            <div class="row">
+              <div class="col">
+                <div id="video-container">
+                  <!-- Your webcam video goes here -->
+                  <video id="video_main" autoplay></video>
+                </div>
+                <div id="button-container-ready">
+                  <button
+                    class="custom-btn custom-btn-pause me-3"
+                    id="button-pause"
+                  ></button>
+                  &nbsp&nbsp&nbsp
+                  <button
+                    class="custom-btn custom-btn-start me-3"
+                    id="button-start-main"
+                  ></button>
+                  &nbsp&nbsp&nbsp
+                  <button
+                    class="custom-btn custom-btn-stop"
+                    id="button-stop"
+                  ></button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+        <div class="col-md-6">
+          <br /><br />
+          <div class="container">
+            <div class="row">
+              <div class="col"></div>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
-</div>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script src="./js/popup_script.js"></script>
-
-</body>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="./js/popup_script.js"></script>
+  </body>
 </html>
