@@ -30,25 +30,25 @@ def create_human():
     img1 = request.json['image']
     img1 = img1.split(',')[1]
     img1 = Image.open(BytesIO(base64.b64decode(img1)))
-    img1.save("image.jpg", "JPEG")
+    img1.save("base_face_img.jpg", "JPEG")
     # Check if image contains human face(s)
     try:
-        detected_faces = DeepFace.extract_faces("image.jpg")
-    except ValueError as e:
-        if (e.args[0].startswith("Face")):
-            state = "얼굴 미감지"
-    else:
+        detected_faces = DeepFace.extract_faces("base_face_img.jpg")
         # Determine number of detected faces
         num_faces = len(detected_faces)
         if num_faces == 1:
             state = "정상입니다."
         else:
             state = "얼굴 여러 개 감지"
+    except ValueError as e:
+        print(e.args[0])
+        if (e.args[0].startswith("Face")):
+            state = "얼굴 미감지"
+
 
     response = jsonify({'result': state})
     response.headers.add('Access-Control-Allow-Origin', '*')
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
-
     return response
 
 

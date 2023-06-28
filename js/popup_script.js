@@ -43,103 +43,82 @@ let startMainButton;
 let pauseButton;
 let stopButton;
 let input_name;
-let input_subject;
 let input_hour;
 let input_minute;
 let current_state;
 let textBox;
 let baseHuman;
-let current_time;
+let totalTime;
 let circle;
 let circle_text;
 let resultButton;
-let mainFirstRow;
-let mainSecondRow;
-let concentration;
-let notes;
-readySection = document.getElementById("pop-ready");
-mainSection = document.getElementById("pop-main");
+let averageStudyRate;
+let maxStudyRate;
+let minStudyRate;
+let currentDate;
+
 registerButton = document.getElementById("button-register");
-startReadyButton = document.getElementById("button-start-ready");
-startMainButton = document.getElementById("button-start-main");
-pauseButton = document.getElementById("button-pause");
-stopButton = document.getElementById("button-stop");
 input_name = document.getElementById("input_name");
-input_subject = document.getElementById("input_subject");
-input_hour = document.getElementById("input_hour");
-input_minute = document.getElementById("input_minute");
-current_state = document.getElementById("current_state");
-textBox = document.getElementById("data-container");
-current_time = document.getElementById("current_time");
-video = document.getElementById("video_ready");
-circle = document.getElementById("circle");
-circle_text = document.getElementById("circle-text");
-resultButton = document.getElementById("button-next");
-mainFirstRow = document.getElementById("main-first-row");
-mainSecondRow = document.getElementById("main-second-row");
-concentration = document.getElementById("concentration");
-notes = document.getElementById("notes");
-startReadyButton.disabled = true;
-mainSecondRow.style.display = "none";
-readySection.style.display = "block";
-mainSection.style.display = "none";
-resultButton.style.display = "none";
 
-// 현재 얼굴이 등록 되었다면, 시작 가능합니다.
-startReadyButton.addEventListener("click", function () {
-  mainSection.style.display = "block";
-  readySection.style.display = "none";
-  video_on("video_main");
-});
-
-registerButton.addEventListener("click", function () {
-  //todo!, execute_createHuman() every 2 seconds, and if execute_createHuman(), change the textBox's text, using change_text(text)
-  registerButton.disabled = true;
-  let id = setInterval(function () {
-    // Call capture_createHuman() function and change text
-    capture_createHuman("http://localhost:5000/create-human")
-      .then((result) => {
-        if (result.result === "정상입니다.") {
-          video.pause();
-          const confirmed = confirm("현재 얼굴을 등록하시겠습니까?");
-          if (confirmed) {
-            // 만약 얼굴 등록을 원한다면 휴먼 오브젝트 생성
-            baseHuman = new Human(
-              input_name.value,
-              result.img,
-              input_subject.value,
-              "None"
+if (registerButton) {
+  registerButton.addEventListener("click", function () {
+    console.log("눌렀는데");
+    //todo!, execute_createHuman() every 2 seconds, and if execute_createHuman(), change the textBox's text, using change_text(text)
+    registerButton.disabled = true;
+    let id = setInterval(function () {
+      // Call capture_createHuman() function and change text
+      capture_createHuman("http://localhost:5000/create-human")
+        .then((result) => {
+          if (result.result === "정상입니다.") {
+            video.pause();
+            const name = prompt(
+              "Please enter your name for face registration:"
             );
-            console.log("휴먼 등록합니다.");
-
-            startReadyButton.disabled = false;
+            if (name) {
+              // 만약 얼굴 등록을 원한다면 휴먼 오브젝트 생성
+              baseHuman = new Human(name, result.img, "study", "None");
+              const popup = window.open("./popup_main.html", "Popup");
+              popup.postMessage({ name }, "*");
+              changeInfoStart();
+            } else {
+              // 원하지 않는다면, 다시 함수 재생
+              registerButton.disabled = false;
+              video.play();
+            }
           } else {
-            // 원하지 않는다면, 다시 함수 재생
+            alert(result.result);
             registerButton.disabled = false;
-            video.play();
           }
-        } else {
-          alert(result.result);
-          registerButton.disabled = false;
-        }
 
-        clearInterval(id);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }, 2000);
-});
+          clearInterval(id);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }, 2000);
+  });
+}
 
+console.log("여기");
 // 스터디 체크를 해봅 시다
-let check_num = 1;
+// 3초마다 1씩 증가
+let check3Num = 1;
+// 1초마다 1씩 증가
+let check1Num = 1;
+// 3초마다 정상인 경우 1씩 증가, 15초마다 초기화
 let normal = 0;
+
+// 15초마다 정상인 경우 1씩 증가
 let total_normal = 0;
-let other_person = 0;
+// 15초마다 비정상인 경우 1씩 증가
 let total_fail = 0;
-let absence = 0;
 var success_interval_num = 0;
 
+let maxRate = 0;
+let minRate = 100;
+
+//
+let totalReward = 0;
 // 여기가 전체 history 저장
 // 형식: [구간 시작시간, 구간 끝시간, 구간의 상태 (normal / absence / other_person)]
 let total_result = [];
@@ -166,7 +145,7 @@ const STATE_STOPPED = "stopped";
 
 // State variable
 let start_time = Date.now();
-let currentState = STATE_STOPPED;
+let sameHuman = true;
 let intervalId;
 var stopped_time = 0;
 let start_stop_time = Date.now();
@@ -182,9 +161,8 @@ function time_set(hour, minute, second) {
   if (parseInt(second) < 10) {
     second = "0" + second;
   }
-
-  current_time.innerHTML =
-    `<h1 class = "text-pop-time" id = "current_time">` +
+  totalTime.innerHTML =
+    `<h1 class="text-pop-large", id="totalTime">` +
     hour +
     `:` +
     minute +
@@ -193,122 +171,141 @@ function time_set(hour, minute, second) {
     `</h1>`;
 }
 
-startMainButton.addEventListener("click", startFunction);
+// 1초에 한번씩 실행되야 하는 것
+function startFunction() {
+  currentDate = new Date();
+  start_time = Date.now();
+  intervalId = setInterval(function () {
+    capture_compareHuman("http://localhost:5000/compare-human", baseHuman)
+      .then((result) => {
+        const compare_result = result.result;
+        var cur_time = Date.now();
+        let timer = time_processing(Math.floor((cur_time - start_time) / 1000));
+        let history = [];
+        // 여기서 Total Time을 바꿔줍니다.
+        time_set(timer[0], timer[1], timer[2]);
+        if (compare_result === "정상") {
+          sameHuman = true;
+        } else {
+          sameHuman = false;
+        }
+        check1Num++;
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, 1000);
+  if (video.paused) {
+    video.play();
+  }
+}
 
-stopButton.addEventListener("click", function () {
-  if (currentState == STATE_CHECKING || currentState == STATE_PAUSED) {
-    // Stop checking state
-    currentState = STATE_STOPPED;
-    // Clear interval so check() function stops being called
+function studyFunction() {
+  inteval3Id = setInterval(function () {
+    capture_studyHuman("http://localhost:5000/study-human").then((result) => {
+      const compare_result = result.result;
+      check3Num++;
+      // 같은 사람이면서 공부 하고 있음
+      if (compare_result == "정상" && sameHuman) {
+        normal++;
+      }
+      if (check3Num % 5 == 0) {
+        // 그래프 바꿔주기
+        changeGraph();
+
+        if (normal > 2) {
+          totalReward += (normal - 2) * 10;
+          total_normal++;
+        } else {
+          total_fail++;
+        }
+        // maxRate 설정
+        if (maxRate < normal * 20) {
+          maxRate = normal * 20;
+        }
+        if (minRate > normal * 20) {
+          minRate = normal * 20;
+        }
+        normal = 0;
+      }
+    });
+  }, 3000);
+}
+
+function changeInfoStart() {
+  startMainButton = document.getElementById("button-start-main");
+  stopButton = document.getElementById("button-stop");
+  totalTime = document.getElementById("totalTime");
+  startTimeInfo = document.getElementById("startTimeInfo");
+  nameInfo = document.getElementById("nameInfo");
+  dateInfo = document.getElementById("dateInfo");
+  endTimeInfo = document.getElementById("endTimeInfo");
+  maxStudyRate = document.getElementById("maxStudyRate");
+  minStudyRate = document.getElementById("minStudyRate");
+  averageStudyRate = document.getElementById("averageStudyRate");
+  reward = document.getElementById("reward");
+  startMainButton.addEventListener("click", startFunction);
+
+  stopButton.addEventListener("click", function () {
     clearInterval(intervalId);
     // history show 하는 함수
     history_show();
     startMainButton.style.display = "none";
     stopButton.style.display = "none";
-    pauseButton.style.display = "none";
-    resultButton.style.display = "block";
-  }
-});
+  });
 
-resultButton.addEventListener("click", result_show);
-function startFunction() {
-  if (currentState == STATE_STOPPED || currentState == STATE_PAUSED) {
-    if (currentState != STATE_PAUSED) {
-      start_time = Date.now();
-    }
-    if (currentState == STATE_PAUSED) {
-      let end_stop_time = Date.now();
-      stopped_time = (stopped_time + end_stop_time - start_stop_time) / 10;
-    }
-    // Start checking state
-    currentState = STATE_CHECKING;
-    // Invoke check() function every 2 seconds
-    intervalId = setInterval(function () {
-      capture_compareHuman("http://localhost:5000/compare-human", baseHuman)
-        .then((result) => {
-          const compare_result = result.result;
-          var cur_time = Date.now();
-          let timer = time_processing(
-            Math.floor((cur_time - start_time - stopped_time) / 1000)
-          );
+  let currentDate = new Date();
+  dateInfo.innerHTML =
+    `<h1 class="text-pop-small", id="dateInfo">` +
+    currentDate.getDate() +
+    `:` +
+    (currentDate.getMonth() + 1) +
+    `:` +
+    currentDate.getFullYear() +
+    `</h1>`;
 
-          //여기부터 history 출력을 위한 부분
-          let history = [];
-          for (var i = 0; i < total_result.length; i++) {
-            var interval_start = time_processing(total_result[i][0]);
-            var interval_end = time_processing(total_result[i][1]);
-            var string1 = `${interval_start[0]}:${interval_start[1]}:${interval_start[2]} ~ 
-              ${interval_end[0]}:${interval_end[1]}:${interval_end[2]}   `;
-            if (total_result[i][2] == "normal") {
-              string1 = string1 + "SUCCESS";
-            } else {
-              string1 = string1 + "FAIL";
-            }
-            history.push(string1);
-          }
-          //여기까지
-          time_set(timer[0], timer[1], timer[2]);
-          if (compare_result === "정상") {
-            normal++;
-            total_normal++;
-          } else if (compare_result === "다른 사람") {
-            other_person++;
-            total_fail++;
-          } else {
-            absence++;
-            total_fail++;
-          }
-          circle_text.innerHTML =
-            `<span class="circle-text" id = "circle-text">` +
-            compare_result +
-            `</span>`;
-          check_num++;
-          // history에 저장 todo! 현재 10초당 한 번
-          if (check_num % 10 == 0) {
-            if (normal > 4) {
-              total_result.push([check_num - 10, check_num, "normal"]);
-              success_interval_num++;
-            } else {
-              if (other_person <= absence) {
-                total_result.push([check_num - 10, check_num, "absence"]);
-              } else {
-                total_result.push([check_num - 10, check_num, "other_person"]);
-              }
-            }
-            normal = 0;
-            absence = 0;
-            other_person = 0;
-          }
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    }, 1000);
-    if (video.paused) {
-      video.play();
-    }
-  }
+  nameInfo.innerHTML =
+    `<h1 class="text-pop-small", id="nameInfo">` + input_name.value + `</h1>`;
+  startTimeInfo.innerHTML =
+    `<h1 class="text-pop-small", id="startTimeInfo">` +
+    cuurentDate.getHours() +
+    `:` +
+    currentDate.getMinutes() +
+    `:` +
+    currentDate.getSeconds() +
+    `</h1>`;
 }
 
-// check() function ok는 success 인지 아닌지
-function change_text(ok, text) {
-  // Get data from web-cam and deal with it
-  // Update data container element
-
-  if (ok) {
-    textBox.innerHTML =
-      `<div class="text-box">
-<success>정상</success><br><br><ment>` +
-      text +
-      `</ment></div>`;
-  } else {
-    textBox.innerHTML =
-      `<div class="text-box">
-<fail>실패</fail><br><br><ment>` +
-      text +
-      `</ment></div>`;
-  }
+function changeInfoEnd() {
+  let currentDate = new Date();
+  endTimeInfo.innerHTML =
+    `<h1 class="text-pop-small", id="startTimeInfo">` +
+    cuurentDate.getHours() +
+    `:` +
+    currentDate.getMinutes() +
+    `:` +
+    currentDate.getSeconds() +
+    `</h1>`;
 }
+
+function changeTimeEnd() {
+  minute = total_normal / 4;
+  second = (total_normal % 4) * 15;
+  endTimeInfo.innerHTML =
+    `<h1 class="text-pop-large", id="endTimeInfo">` +
+    minute +
+    `:` +
+    second +
+    `</h1>`;
+}
+
+function changeRate_and_Reward_End() {
+  reward.innerHTML =
+    `<h1 class="text-pop-large", id="endTimeInfo">` + totalReward + `</h1>`;
+}
+
+function changeGraph() {}
+
 function time_processing(second) {
   let res_hour = Math.floor(second / 3600);
   let res_minute = Math.floor((second - 3600 * res_hour) / 60);
@@ -344,31 +341,6 @@ function history_show() {
   }
   innerString += `</div>`;
   card_container.innerHTML = innerString;
-}
-
-function result_show() {
-  mainFirstRow.style.display = "none";
-  mainSecondRow.style.display = "block";
-  circle.style.display = "none";
-
-  // 학습 집중도
-  let concentration_ratio = (total_normal / check_num) * 100;
-  // 보상 포인트 구간 하나 당 1 note
-  let bosang = success_interval_num;
-  // 보상 포인트는 나중에 알아서 설정
-  // history 설정 현재는 어느 구간에서 체크 했는지 안 써있음
-
-  concentration.innerHTML =
-    `<h1 class = "text-pop-time" id = "concentration">` +
-    concentration_ratio.toFixed(1) +
-    `%` +
-    `</h1>`;
-
-  notes.innerHTML =
-    `<h1 class = "text-pop-time" id = "concentration">` +
-    bosang +
-    ` NOTE` +
-    `</h1>`;
 }
 
 // 여기서 result는 "얼굴 미감지", "정상입니다." , "얼굴 여러개 감지" 셋 중 하나
@@ -426,6 +398,50 @@ function capture_compareHuman(python_url, human2) {
           result: result.result,
           img1: dataUrl,
           img2: human2.img,
+        };
+        resolve(ret);
+      })
+      .catch((error) => {
+        reject("fuck you" + error);
+      });
+  });
+}
+
+// 2.4초 동안 16장의 사진을 찍어서 datURL형태의 이미지 리스트를 생성
+// 해당 이미지 리스트를 python URL에 보내서 결과를 받음
+function capture_studyHuman(python_url) {
+  return new Promise((resolve, reject) => {
+    const photoList = []; // Array to store captured photos
+    let captureCount = 0; // Counter for capturing photos
+    const captureIntervalId = setInterval(function () {
+      if (captureCount < 16) {
+        const canvas = document.createElement("canvas");
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas
+          .getContext("2d")
+          .drawImage(video, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL("studyImage" + captureCount + "/jpeg");
+        // Increment the capture count
+        captureCount++;
+        photoList.push(dataUrl);
+      } else {
+        // Stop capturing photos after 16 captures
+        clearInterval(captureIntervalId);
+      }
+    }, 150);
+
+    fetch(python_url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ imgList: photoList }),
+    })
+      .then((response) => response.json())
+      .then((result) => {
+        const ret = {
+          result: result.result,
         };
         resolve(ret);
       })

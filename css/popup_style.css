@@ -10,6 +10,19 @@
  * Copyright 2011-2021 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  */
+@font-face {
+font-family: 'GmarketSansBold';
+src: url('../fonts/GmarketSansBold.otf') format('opentype');
+}
+@font-face {
+font-family: 'GmarketSansMedium';
+src: url('../fonts/GmarketSansMedium.otf') format('opentype');
+}
+@font-face {
+  font-family: 'GmarketSansLight';
+  src: url('../fonts/GmarketSansLight.otf') format('opentype');
+}
+
 :root {
   --bs-blue: #0d6efd;
   --bs-indigo: #6610f2;
@@ -3059,6 +3072,7 @@ textarea.form-control-lg {
   border: none;
   padding: 0;
   cursor: pointer;
+  color: white;
   transition: transform 0.2s ease-in-out;
 }
 
@@ -3071,8 +3085,22 @@ textarea.form-control-lg {
   background-repeat: no-repeat;
   background-position: center;
   background-position-x: 40px;
-}
+  margin-bottom: 30px;
+  font-size: 24px;
+  font-family: 'GmarketSansMedium', sans-serif;
+  
 
+
+}
+.custom-btn-text {
+  width: 120px;
+  height: 80px;
+  border-radius: 80px 80px 80px 80px;
+  font-size: 24px;
+  font-family: 'GmarketSansMedium', sans-serif;
+
+
+}
 
 .custom-btn-pause {
   width: 90px;
@@ -3085,17 +3113,49 @@ textarea.form-control-lg {
   background-position-x: 30px;
 }
 
+.custom-text-box-small {
+  width: 90%; /* Adjust width as needed */
+  height: 100px; /* Adjust height as needed */
+  border: 1px solid gray; /* Set border style */
+  border-radius: 10px 10px 10px 10px;
+  justify-content: center;
+  display: flex;
+  
+  align-items: center;
+}
 
+.custom-text-box-items {
+  width: 90%; /* Adjust width as needed */
+  height: 100px; /* Adjust height as needed */
+  border: 1px solid gray; /* Set border style */
+  border-radius: 10px 10px 10px 10px;
+  justify-content: center;
+  display: flex;
+  
+  align-items: center;
+}
+.custom-text-box-large {
+  width: 95%; /* Adjust width as needed */
+  height: 350px; /* Adjust height as needed */
+  border: 1px solid gray; /* Set border style */
+  border-radius: 10px 10px 10px 10px;
+  padding: 10px; /* Adjust padding as needed */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 .custom-btn-stop {
-  width: 90px;
-  height: 60px;
+
+  width: 120px;
+  height: 80px;
   border-radius: 60px 60px 60px 60px;
   background-image: url("../images/stop.png");
   background-color: red;
-  background-size: 30px 30px;
+  background-size: 40px 40px;
   background-repeat: no-repeat;
   background-position: center;
-  background-position-x: 30px;
+  margin-bottom: 30px;
+
 }
 
 
@@ -11394,33 +11454,31 @@ hr.divider-light {
 
 
 .video-container {
-  width: 100%; /* Set the width of the video container */
-  height: 420px; /* Set the height of the video container */
-  background-image: url("../images/screen.png");
+  width: 80%; /* Set the width of the video container */
+  height: 460px; /* Set the height of the video container */
+  background-image: url("../images/laptop4.png");
   background-size: 100% 100%;
   background-repeat: no-repeat;
   background-position: center;
-  position: relative; /* Set the position of the video container to relative */
+  margin-left: 10%;
 }
 
 .video {
-  position: absolute; /* Set the position of the video to absolute */
-  top: 44%; /* Position the video at the center of the blackboard */
+  position: relative; /* Set the position of the video to absolute */
+  top: 45%; /* Position the video at the center of the blackboard */
   left: 50%; /* Position the video at the center of the blackboard */
-  width: 350px;
-  height: 280px;
+  width: 85%;
   transform: translate(-50%, -50%); /* Center the video inside the blackboard */
 }
 .data-container {
-  width: 450px; /* Set the width of the data container */
-  height: 300px; /* Set the height of the data container */
-  background-image: url("../assets/img/board.png");
-  background-size: 450px 300px;
+  width: 120px; /* Set the width of the data container */
+  height: 80px; /* Set the height of the data container */
+  background-image: url("../images/board.png");
+  background-size: 120px 80px;
   background-repeat: no-repeat;
   background-position: center;
   position: relative;
-  top: 50px;
-  left: 150px;
+
 }
 
 .border-end-pop {
@@ -11602,14 +11660,40 @@ hr.divider-light {
 }
 
 .text-pop {
-  font-family: "consolas";
+  font-family: "GmarketSansMedium", sans-serif;
   font-size: 24px;
 }
 
 .text-pop-small{
-  font-family: "consolas";
+  font-family: "GmarketSansLight", sans-serif;
+  justify-content: center;
   font-size: 18px;
+}
+
+.text-pop-small-rate {
+  font-family: "GmarketSansMedium", sans-serif;
+  font-size: 18px;
+  justify-content: center;
+  text-align: center;
+  align-items: center;
   color:gray;
+  margin-top: 15px;
+  margin-right: 30px;
+
+}
+
+.text-pop-large-rate {
+  font-family: "GmarketSansBold", sans-serif;
+  font-size: 32px;
+  justify-content: center;
+  text-align: center;
+  align-items: center;
+  color: red;
+  margin-top: 15px;
+  margin-right: 0px;
+  border: black;
+  border-left: #000;
+
 }
 
 .text-pop-small-fail{
@@ -11635,6 +11719,10 @@ hr.divider-light {
 
 }
 
+.border-right {
+  border-right: 1px solid gray; /* Adjust the border style as needed */
+  padding-right: 10px; /* Add some right padding to separate the text from the border */
+}
 
 
 #main {
