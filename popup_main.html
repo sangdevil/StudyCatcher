@@ -141,11 +141,11 @@
               </div>
 
               <div class="col-lg-3">
-                <h1 class="text-pop-small">Reward</h1>
+                <h1 class="text-pop-small" id="reward">Reward</h1>
                 <div class="custom-text-box-small">
                   <div class="row justify-content-center">
                     <div class="col">
-                      <h3>0</h3>
+                      <h3 id="totalreward">0</h3>
                     </div>
                   </div>
                 </div>
@@ -166,8 +166,7 @@
     var ctx = document.getElementById("myChart").getContext("2d");
 
     var data = Array(12)
-      .fill()
-      .map(() => Math.random()); // Expanded data to 180 seconds
+      .fill(0); // Expanded data to 180 seconds
 
     var chart = new Chart(ctx, {
       type: "bar",

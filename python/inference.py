@@ -13,6 +13,7 @@ import torch.backends.cudnn as cudnn
 from timm.models import create_model
 
 import utils
+import modeling_finetune
 import video_transforms as video_transforms
 import volume_transforms as volume_transforms
 import cv2
@@ -74,7 +75,7 @@ for i in range(1):
         init_scale=0.001
     )
 
-    checkpoint = torch.load(os.path.join("DreamLadders\checkpoints", f"valid_{i}.pth"), map_location='cpu')
+    checkpoint = torch.load(os.path.join("checkpoints", f"valid_{i}.pth"), map_location='cpu')
 
     if "model" in checkpoint:
         checkpoint_model=checkpoint["model"]
@@ -199,7 +200,7 @@ def detect_keypoints(video):
     return coords
 
 
-
+# 16개의 frame이 모일 때마다 이 함수 실행
 def run_classification(frames):
     print('[classification] classification starts')
 
@@ -232,41 +233,3 @@ def run_classification(frames):
     print(f'class: {classes[idx]}')
     print(f'[classification] elapsed time: {time.time()-start_time}')
     return classes[idx]
-
-
-cap = cv2.VideoCapture(0)
-
-# 3/16초 마다 한 번 캡처하도록 설정.
-delay = 3/16
-
-frames = []
-start_time = time.time()
-
-while True:
-    # 웹캠에서 프레임을 읽는다.
-    ret, frame = cap.read()
-    # 읽기에 실패했다면 루프를 종료한다.
-    if not ret:
-        break
-
-    center = (frame.shape[1] // 2, frame.shape[0] // 2)  # (frame_width // 2, frame_height // 2)
-    frame = cv2.getRectSubPix(frame, (480, 480), center)
-
-    # 잘라낸 프레임을 224x224로 리사이즈한다.
-    frame = cv2.resize(frame, (224, 224))
-
-    # 읽은 프레임을 frames에 추가한다.
-    frames.append(frame)
-
-    # 3초가 지났고, frames의 길이가 16이라면 분류를 실행한다.
-    if time.time() - start_time >= 3 and len(frames) == 16:
-        print(time.time() - start_time)
-        run_classification(frames)
-        frames = []
-        start_time = time.time()
-
-    # delay 후 다음 프레임을 읽는다.
-    time.sleep(delay)
-
-# 웹캠을 해제한다.
-cap.release()

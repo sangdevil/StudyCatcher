@@ -37,7 +37,6 @@ window.addEventListener("load", function () {
 let video;
 let registerButton;
 
-
 registerButton = document.getElementById("button-register");
 
 registerButton.addEventListener("click", function () {
@@ -50,16 +49,14 @@ registerButton.addEventListener("click", function () {
       .then((result) => {
         if (result.result === "정상입니다.") {
           video.pause();
-          const name = prompt(
-            "Please enter your name for face registration:"
-          );
+          const name = prompt("Please enter your name for face registration:");
           if (name) {
             // 만약 얼굴 등록을 원한다면 휴먼 오브젝트 생성
-            const popup = window.open("./popup_main.html", "Popup");
             var message = {
               name: name,
               image: result.img,
             };
+            const popup = window.location.replace("./popup_main.html", "Popup");
             popup.postMessage(message, "*");
           } else {
             // 원하지 않는다면, 다시 함수 재생
@@ -79,5 +76,33 @@ registerButton.addEventListener("click", function () {
   }, 2000);
 });
 
+// 여기서 result는 "얼굴 미감지", "정상입니다." , "얼굴 여러개 감지" 셋 중 하나
+function capture_createHuman(python_url) {
+  return new Promise((resolve, reject) => {
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
 
+    const dataUrl = canvas.toDataURL("image/jpeg");
 
+    fetch(python_url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ image: dataUrl }),
+    })
+      .then((response) => response.json())
+      .then((result) => {
+        const ret = {
+          result: result.result,
+          img: dataUrl,
+        };
+        resolve(ret);
+      })
+      .catch((error) => {
+        reject(error);
+      });
+  });
+}
