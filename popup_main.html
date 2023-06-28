@@ -4,60 +4,35 @@
     <meta charset="UTF-8" />
     <title>Study Catcher</title>
     <link rel="stylesheet" href="./css/popup_style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
   <body>
     <div class="container-fluid">
       <div class="row justify-content-start">
-        <div class="col-md-12">
+        <div class="col-md-6">
           <br />
           <h1 class="text-pop-big">&nbsp START</h1>
-        </div>
-      </div>
-      <div class="row gx-4 gx-lg-5 justify-content-center">
-        <div class="col-md-6">
-          <div class="container">
-            <br />
-            <div class="row">
-              <div class="col">
-                &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-                <div class="circle circle-red">
-                  <span class="circle-text">녹화중</span>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col">
-                <div id="video-container">
-                  <!-- Your webcam video goes here -->
-                  <video id="video_main" autoplay></video>
-                </div>
-                <div id="button-container-ready">
-                  <button
-                    class="custom-btn custom-btn-pause me-3"
-                    id="button-pause"
-                  ></button>
-                  &nbsp&nbsp&nbsp
-                  <button
-                    class="custom-btn custom-btn-start me-3"
-                    id="button-start-main"
-                  ></button>
-                  &nbsp&nbsp&nbsp
-                  <button
-                    class="custom-btn custom-btn-stop"
-                    id="button-stop"
-                  ></button>
-                </div>
-              </div>
-            </div>
+          <br />
+          <div class="circle circle-red">
+            <span class="circle-text">녹화중</span>
+          </div>
+          <br />
+          <div id="video-container">
+            <!-- Your webcam video goes here -->
+            <video id="video_main" autoplay></video>
+          </div>
+          <div id="button-container-ready">
+            <button class="custom-btn custom-btn-pause me-3" id="button-pause"></button>
+            &nbsp&nbsp&nbsp
+            <button class="custom-btn custom-btn-start me-3" id="button-start-main"></button>
+            &nbsp&nbsp&nbsp
+            <button class="custom-btn custom-btn-stop" id="button-stop"></button>
           </div>
         </div>
         <div class="col-md-6">
-          <br /><br />
-          <div class="container">
-            <div class="row">
-              <div class="col"></div>
-            </div>
-          </div>
+          <h2>Total Time: <span id="total-time">00:00:00</span></h2> <!-- Added timer -->
+          <h2>Total Study Time: <span id="total-study-time">00:00:00</span></h2> <!-- Added timer -->
+          <canvas id="myChart" width="300" height="150"></canvas>
         </div>
       </div>
     </div>
@@ -66,5 +41,55 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="./js/popup_script.js"></script>
+    <script>
+      var ctx = document.getElementById('myChart').getContext('2d');
+
+      var data = Array(12).fill().map(() => Math.random());  // Expanded data to 180 seconds
+
+      var chart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+              labels: Array.from({length: data.length}, (_, i) => `${(i+1)*15} sec`),  // Changed labels to only show the end of each period
+              datasets: [{
+                  label: undefined,  // Set label to undefined to hide it
+                  data: data,
+                  backgroundColor: 'purple',
+                  barThickness: 10
+              }]
+          },
+          options: {
+              scales: {
+                  y: {
+                      min: 0,
+                      max: 1,
+                      ticks: {
+                          stepSize: 0.2,
+                          callback: function(value) { return (value * 100).toFixed(0) + "%"; }
+                      }
+                  }
+              },
+              plugins: {
+                  annotation: {
+                      annotations: [{
+                          type: 'line',
+                          yMin: 0.6,
+                          yMax: 0.6,
+                          borderColor: 'red',
+                          borderWidth: 2,
+                      }]
+                  }
+              },
+              plugins: {
+                legend: {
+                    labels: {
+                        generateLabels: function() {
+                            return [];
+                        }
+                    }
+                }
+              },
+          }
+      });
+    </script>
   </body>
 </html>
