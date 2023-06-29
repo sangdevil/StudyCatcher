@@ -45,7 +45,7 @@ registerButton.addEventListener("click", function () {
   registerButton.disabled = true;
   let id = setInterval(function () {
     // Call capture_createHuman() function and change text
-    capture_createHuman("http://localhost:5000/create-human")
+    capture_createHuman("http://localhost:5000/api/create-human")
       .then((result) => {
         if (result.result === "정상입니다.") {
           video.pause();

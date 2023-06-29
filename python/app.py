@@ -35,7 +35,7 @@ app = Flask(__name__)
 CORS(app)
 
 
-@app.route('/create-human/', methods=['POST', 'OPTIONS'])
+@app.route('/api/create-human/', methods=['POST', 'OPTIONS'])
 def handle_create_human():
     if request.method == 'OPTIONS':
         response = make_response()
@@ -47,7 +47,7 @@ def handle_create_human():
         return create_human()
 
 
-@app.route('/create-human', methods=['POST'])
+@app.route('/api/create-human', methods=['POST'])
 def create_human():
     global base_human
     img1 = request.json['image']
@@ -76,7 +76,7 @@ def create_human():
     return response
 
 
-@app.route('/compare-human', methods=['POST'])
+@app.route('/api/compare-human', methods=['POST'])
 def compare_human():
     print()
     # img1 에서는 항상 얼굴이 있는 파일만 준다.
@@ -91,20 +91,18 @@ def compare_human():
         img2 = Image.open(BytesIO(base64.b64decode(img2)))
         img2 = img2.convert('RGB')
         img2.save("image2.jpg", "JPEG")
-    base_human.save("base_face_img.jpg", "JPEG")
     
     models = ["SFace"]
     try:
         result = DeepFace.verify(img1_path = "image1.jpg",
-                                 img2_path="baseface_img.jpg",  # 2번 이미지
+                                 img2_path="base_face_img.jpg",  # 2번 이미지
                                  model_name=models[0],  # SFace 사용
                                  distance_metric="euclidean_l2",
-                                 enforce_detection=True)
+                                 enforce_detection=False)
         same_people = result['verified']
 
         state = '정상' if same_people else '다른 사람'
     except ValueError as e:
-
         if 'Face' in e.args[0]:
             state = '얼굴 미감지'
         else:
@@ -118,11 +116,29 @@ def compare_human():
     print(response)
     return response
 
-@app.route("/ai", methods=['POST'])
+
+@app.route('/api/study-human', methods=['POST'])
+def study_human():
+    images = request.json['imgList']
+    frames = []
+    for img in images:
+        img = img.split(',')[1]
+        img = Image.open(BytesIO(base64.b64decode(img)))
+        img = img.convert('RGB')
+        frames.append(np.array(img))  # 이미지를 numpy 배열로 변환하여 frames 리스트에 추가합니다.
+    state = processing(frames)  # frames를 processing 함수에 전달합니다.
+    response = jsonify({'result': state})
+
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+
+    return response
+
+
 def processing(frames):
     buffer = np.array(frames)  # list를 numpy 배열로 변환합니다.
-    
-    a, height, width, b = buffer.shape
+    num_frames = buffer.shape[0]  # Get the number of frames
+    height, width, channels = buffer[0].shape  # Get the shape of the first frame
     keypoints = detect_keypoints(buffer)
     heatmap = generate_batch_heatmap(keypoints, height, width)
     buffer = data_transform(buffer)
