@@ -47,7 +47,6 @@ let registerButton;
 registerButton = document.getElementById("button-register");
 
 registerButton.addEventListener("click", function () {
-  console.log("눌렀는데");
   //todo!, execute_createHuman() every 2 seconds, and if execute_createHuman(), change the textBox's text, using change_text(text)
   registerButton.disabled = true;
   let id = setInterval(function () {
@@ -56,13 +55,11 @@ registerButton.addEventListener("click", function () {
       .then((result) => {
         if (result.result === "정상입니다.") {
           video.pause();
-          const name = prompt("Please enter your name for face registration:");
-          if (name) {
+          const confirmed = confirm(
+            "Are you sure to register your current face?"
+          );
+          if (confirmed) {
             // 만약 얼굴 등록을 원한다면 휴먼 오브젝트 생성
-            var message = {
-              name: name,
-              image: result.img,
-            };
             var popup = window.open("./popup_main.html", "Popup");
             popup.postMessage(message, "*");
           } else {

@@ -91,22 +91,22 @@ def compare_human():
         img2 = Image.open(BytesIO(base64.b64decode(img2)))
         img2 = img2.convert('RGB')
         img2.save("image2.jpg", "JPEG")    
-    models = ["SFace"]
+    models = ["Facenet"]
     try:
         result = DeepFace.verify(img1_path = "image1.jpg",
-                                 img2_path="base_face_img.jpg",  # 2번 이미지
+                                 img2_path= "base_face_img.jpg",  # 2번 이미지
                                  model_name=models[0],  # SFace 사용
                                  distance_metric="cosine",
-                                 enforce_detection=True)
+                                 enforce_detection=True,
+                                 detector_backend = "mediapipe")
         
-        threshHold = 0.7
+        threshHold = 0.35
         print(result)
         
-        if result['distance'] < 0.7:
+        if result['distance'] < threshHold:
             state = '정상'
         else:
             state = '다른 사람'
-
     except ValueError as e:
 
         if 'Face' in e.args[0]:
@@ -124,20 +124,28 @@ def compare_human():
 
 
 
+
 @app.route('/api/study-human', methods=['POST'])
 def study_human():
+    start_time = time.time()  # Get the start time before processing the request
+
     images = request.json['imgList']
     frames = []
     for img in images:
         img = img.split(',')[1]
         img = Image.open(BytesIO(base64.b64decode(img)))
         img = img.convert('RGB')
-        frames.append(np.array(img))  # 이미지를 numpy 배열로 변환하여 frames 리스트에 추가합니다.
-    state = processing(frames)  # frames를 processing 함수에 전달합니다.
-    response = jsonify({'result': state})
+        frames.append(np.array(img))
 
+    state = processing(frames)
+
+    response = jsonify({'result': state})
     response.headers.add('Access-Control-Allow-Origin', '*')
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+
+    end_time = time.time()  # Get the end time after processing the request
+    elapsed_time = end_time - start_time  # Calculate the elapsed time in seconds
+    print("Response Time:", elapsed_time, "seconds")
 
     return response
 

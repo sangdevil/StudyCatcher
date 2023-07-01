@@ -15,6 +15,7 @@ let userImage;
 let intervalId;
 let interval3Id;
 let interval1Id;
+let interval1MinuteId;
 let registerButton;
 let startMainButton;
 let stopButton;
@@ -110,21 +111,13 @@ ttrwd = document.getElementById("totalreward");
 totalStudyTime = document.getElementById("totalStudyTime");
 baseHuman = new Human(userName, userImage, "none", "none");
 ctx = document.getElementById("myChart").getContext("2d");
-baseImg = ctx = document.getElementById("dynamic-image");
+baseImg = document.getElementById("dynamic-image");
 startMainButton.addEventListener("click", startFunction);
 
 baseImg.src = "./python/base_face_img.jpg";
 
 stopButton.addEventListener("click", function () {
-  clearInterval(intervalId);
-  clearInterval(interval3Id);
-  video_off();
-  // history show 하는 함수
-  changeInfoEnd();
-  changeTimeEnd();
-  changeRate_and_Reward_End();
-  startMainButton.style.display = "none";
-  stopButton.style.display = "none";
+  stopFunction();
 });
 
 // 스터디 체크를 해봅 시다
@@ -132,8 +125,8 @@ stopButton.addEventListener("click", function () {
 let check3Num = 1;
 // 1초마다 1씩 증가
 let check1Num = 1;
-// 3초마다 정상인 경우 1씩 증가, 15초마다 초기화
-let normal = 0;
+// 3초마다 정상인 경우 1씩 증가, 1분마다 초기화
+let normal = 1;
 // 3초마다 공부중인 경우 1씩 증가
 let totalStudyTimeNum = 0;
 
@@ -218,7 +211,10 @@ let chart = new Chart(ctx, {
   },
 });
 
+// chart가 업데이트 될 떄 보상도 증가
 function chartUpdate(changedData) {
+  ttrwd.innerHTML =
+    `<h3 class="text-pop-large", id="totalReward">` + totalReward + `</h3>`;
   chart.data.datesets = changedData;
   chart.update();
 }
@@ -272,11 +268,14 @@ function time_set_small(part, partname, hour, minute, second) {
 function stopFunction() {
   clearInterval(intervalId);
   clearInterval(interval3Id);
+  clearInterval(interval1Id);
+  clearInterval(interval1MinuteId);
   video_off();
   // history show 하는 함수
   changeInfoEnd();
-  changeTimeEnd();
   changeRate_and_Reward_End();
+  changeTimeEnd();
+
   startMainButton.style.display = "none";
   stopButton.style.display = "none";
 }
@@ -288,6 +287,7 @@ function startFunction() {
   changeInfoStart();
   timerChange();
   studyFunction();
+  update1MinuteFunction();
   intervalId = setInterval(function () {
     capture_compareHuman("http://localhost:5000/api/compare-human", baseHuman)
       .then((result) => {
@@ -331,41 +331,49 @@ function studyFunction() {
           normal++;
           totalStudyTimeNum++;
         }
-        if (check3Num % 4 == 0) {
-          // 1분마다 보상 증정, 이 시간대의 공부 %가 50% 이상이라면 보상 증정
-          // 1분마다 currentMinute을 증가시킴.
-          if (normal >= 2) {
-            totalReward += (normal - 1) * 100;
-            total_normal++;
-          } else {
-            total_fail++;
-          }
-          console.log("normal : " + normal);
-          console.log("totalReward : " + totalReward);
-          console.log("curent Rate : " + currentRate);
-          currentRate = normal * 25;
-          rateList.push((currentRate / 100, currentMinute));
-          chartUpdate(rateList);
-          currentMinute++;
-          // maxRate 설정
-          if (maxRate < currentRate) {
-            maxRate = currentRate;
-          }
-          if (minRate > currentRate) {
-            minRate = currentRate;
-          }
-          normal = 0;
-          currentMinute++;
-
-          // 10분이 지나면, 측정 종료
-          if (currentMinute == 10) {
-            stopFunction();
-          }
-        }
-        changeGraph();
       }
     );
   }, 15000);
+}
+
+function update1MinuteFunction() {
+  interval1MinuteId = setInterval(function () {
+    // 1분마다 보상 증정, 이 시간대의 공부 %가 50% 이상이라면 보상 증정
+    // 1분마다 currentMinute을 증가시킴.
+    if (normal >= 2) {
+      totalReward += (normal - 1) * 100;
+      total_normal++;
+    } else {
+      total_fail++;
+    }
+    currentRate = normal * 0.25;
+    console.log("normal : " + normal);
+    console.log("totalReward : " + totalReward);
+    console.log("curent Rate : " + currentRate);
+    console.log("currentMinute : " + currentMinute);
+
+    if (currentRate > 1) {
+      currentRate = 1;
+    }
+
+    // rateList.push((currentRate / 100, currentMinute));
+    rateList[currentMinute] = currentRate;
+    chartUpdate(rateList);
+    currentMinute += 1;
+    // maxRate 설정
+    if (maxRate < currentRate) {
+      maxRate = currentRate;
+    }
+    if (minRate > currentRate) {
+      minRate = currentRate;
+    }
+    normal = 0;
+
+    // 10분이 지나면, 측정 종료
+    if (currentMinute == 10) {
+      stopFunction();
+    }
+  }, 60100);
 }
 
 function changeInfoStart() {
@@ -403,37 +411,52 @@ function changeInfoEnd() {
 }
 
 function changeTimeEnd() {
-  minute = (totalStudyTimeNum * 15) / 60;
-  second = (totalStudyTimeNum * 15) % 60;
-  if (parseInt(second) == 10) {
-    second = "00" + second;
-  }
-  if (parseInt(minute) == 10) {
-    minute = "00" + minute;
-  }
-  totalStudyTime.innerHTML =
-    `<h1 class="text-pop-large", id="totalStudyTime">` +
-    minute +
-    `:` +
-    second +
-    `</h1>`;
+  let cur_time = Date.now();
+  let endTimer = time_processing(
+    Math.floor((averageRate * (cur_time - start_time)) / 1000)
+  );
+  // 여기서 Total Time을 바꿔줍니다.
+  time_set(
+    totalStudyTime,
+    "totalStudyTime",
+    endTimer[0],
+    endTimer[1],
+    endTimer[2]
+  );
 }
 
 function changeRate_and_Reward_End() {
   ttrwd.innerHTML =
     `<h3 class="text-pop-large", id="totalReward">` + totalReward + `</h3>`;
-  let averageRate = (totalStudyTimeNum * 15) / check1Num;
+  let sumRate = 0;
+  let num = 0;
+  for (var i = 0; i < rateList.length; i++) {
+    if (rateList[i] > 0) {
+      num++;
+      sumRate += rateList[i];
+    }
+  }
+  averageRate = sumRate / num;
+
+  if (maxRate > 1) {
+    maxRate = 1;
+  }
   maxStudyRate.innerHTML =
-    `<h3 class="text-pop-large", id="maxStudyRate">` + maxRate + `</h3>`;
+    `<h3 class="text-pop-large", id="maxStudyRate">` +
+    maxRate * 100 +
+    `%` +
+    `</h3>`;
   minStudyRate.innerHTML =
-    `<h3 class="text-pop-large", id="minStudyRate">` + minRate + `</h3>`;
+    `<h3 class="text-pop-large", id="minStudyRate">` +
+    minRate * 100 +
+    `%` +
+    `</h3>`;
   averageStudyRate.innerHTML =
     `<h3 class="text-pop-large", id="averageStudyRate">` +
     Math.floor(averageRate * 100) +
+    `%` +
     `</h3>`;
 }
-
-function changeGraph() {}
 
 function time_processing(second) {
   let res_hour = Math.floor(second / 3600);
