@@ -9,6 +9,32 @@ eslint-env es6
 // Scripts
 //
 // Check if permission has already been granted
+let video;
+let userName;
+let userImage;
+let intervalId;
+let interval3Id;
+let interval1Id;
+let registerButton;
+let startMainButton;
+let stopButton;
+let baseHuman;
+let totalTime;
+let resultButton;
+let averageStudyRate;
+let maxStudyRate;
+let minStudyRate;
+let currentDate;
+let startTimeInfo;
+let nameInfo;
+let dateInfo;
+let endTimeInfo;
+let ttrwd;
+let totalStudyTime;
+let baseImg;
+
+//차트
+let ctx;
 class Human {
   constructor(name, img, subject, pose) {
     // human name will be string name.
@@ -55,41 +81,21 @@ function video_off() {
   }
 }
 // main 페이지가 로드 됐을 때 비디오 다시 틀기
-window.addEventListener("load", function () {
+window.addEventListener("load", function (event) {
   console.log("adfadsfadfadasfad");
   video_on("video_ready");
 });
-
-let video;
-let userName;
-let userImage;
-let intervalId;
-let interval3Id;
-let registerButton;
-let startMainButton;
-let stopButton;
-let baseHuman;
-let totalTime;
-let resultButton;
-let averageStudyRate;
-let maxStudyRate;
-let minStudyRate;
-let currentDate;
-let startTimeInfo;
-let nameInfo;
-let dateInfo;
-let endTimeInfo;
-let ttrwd;
-
 window.addEventListener("message", function (event) {
-  var receivedMessage = event.data; // Get the message object
-
-  // Access the values from the message object
-  userName = receivedMessage.name;
-  console.log(userName);
-  userImage = receivedMessage.image;
-  console.log(userImage);
+  console.log("message done");
+  // var receivedMessage = event.data; // Get the message object
+  // console.log(receivedMessage);
+  // // Access the values from the message object
+  // userName = receivedMessage.name;
+  // console.log(userName);
+  // userImage = receivedMessage.image;
+  // console.log(userImage);
 });
+
 startMainButton = document.getElementById("button-start-main");
 stopButton = document.getElementById("button-stop");
 totalTime = document.getElementById("totalTime");
@@ -100,11 +106,14 @@ endTimeInfo = document.getElementById("endTimeInfo");
 maxStudyRate = document.getElementById("maxStudyRate");
 minStudyRate = document.getElementById("minStudyRate");
 averageStudyRate = document.getElementById("averageStudyRate");
-reward = document.getElementById("reward");
 ttrwd = document.getElementById("totalreward");
-
+totalStudyTime = document.getElementById("totalStudyTime");
 baseHuman = new Human(userName, userImage, "none", "none");
+ctx = document.getElementById("myChart").getContext("2d");
+baseImg = ctx = document.getElementById("dynamic-image");
 startMainButton.addEventListener("click", startFunction);
+
+baseImg.src = "./python/base_face_img.jpg";
 
 stopButton.addEventListener("click", function () {
   clearInterval(intervalId);
@@ -125,6 +134,8 @@ let check3Num = 1;
 let check1Num = 1;
 // 3초마다 정상인 경우 1씩 증가, 15초마다 초기화
 let normal = 0;
+// 3초마다 공부중인 경우 1씩 증가
+let totalStudyTimeNum = 0;
 
 // 15초마다 정상인 경우 1씩 증가
 let total_normal = 0;
@@ -134,6 +145,9 @@ var success_interval_num = 0;
 
 let maxRate = 0;
 let minRate = 100;
+let currentRate = 0;
+let rateList = Array(10).fill(0);
+let currentMinute = 0;
 
 //
 let totalReward = 0;
@@ -151,7 +165,66 @@ var stopped_time = 0;
 let start_stop_time = Date.now();
 let end_stop_time = Date.now();
 
-function time_set(hour, minute, second) {
+// 여기부터 차트 컨트롤 하는 부분 ...
+
+let chart = new Chart(ctx, {
+  type: "bar",
+  data: {
+    labels: Array.from({ length: rateList.length }, (_, i) => `${i + 1} Min`), // Changed labels to only show the end of each period
+    datasets: [
+      {
+        label: undefined, // Set label to undefined to hide it
+        data: rateList,
+        backgroundColor: "purple",
+        barThickness: 10,
+      },
+    ],
+  },
+  options: {
+    scales: {
+      y: {
+        min: 0,
+        max: 1,
+        ticks: {
+          stepSize: 0.2,
+          callback: function (value) {
+            return (value * 100).toFixed(0) + "%";
+          },
+        },
+      },
+    },
+    plugins: {
+      annotation: {
+        annotations: [
+          {
+            type: "line",
+            yMin: 0.6,
+            yMax: 0.6,
+            borderColor: "red",
+            borderWidth: 2,
+          },
+        ],
+      },
+    },
+    plugins: {
+      legend: {
+        labels: {
+          generateLabels: function () {
+            return [];
+          },
+        },
+      },
+    },
+  },
+});
+
+function chartUpdate(changedData) {
+  chart.data.datesets = changedData;
+  chart.update();
+}
+// 여기까지 차트 컨트롤 ..
+
+function time_set(part, partname, hour, minute, second) {
   if (parseInt(hour) < 10) {
     hour = "0" + hour;
   }
@@ -161,8 +234,10 @@ function time_set(hour, minute, second) {
   if (parseInt(second) < 10) {
     second = "0" + second;
   }
-  totalTime.innerHTML =
-    `<h1 class="text-pop-large", id="totalTime">` +
+  part.innerHTML =
+    `<h1 class="text-pop-large", id="` +
+    partname +
+    `">` +
     hour +
     `:` +
     minute +
@@ -171,19 +246,53 @@ function time_set(hour, minute, second) {
     `</h1>`;
 }
 
+function time_set_small(part, partname, hour, minute, second) {
+  if (parseInt(hour) < 10) {
+    hour = "0" + hour;
+  }
+  if (parseInt(minute) < 10) {
+    minute = "0" + minute;
+  }
+  if (parseInt(second) < 10) {
+    second = "0" + second;
+  }
+  part.innerHTML =
+    `<h1 class="text-pop-small", id="` +
+    partname +
+    `">` +
+    hour +
+    `:` +
+    minute +
+    `:` +
+    second +
+    `</h1>`;
+}
+
+// 모든 것이 끝날 때 실행행
+function stopFunction() {
+  clearInterval(intervalId);
+  clearInterval(interval3Id);
+  video_off();
+  // history show 하는 함수
+  changeInfoEnd();
+  changeTimeEnd();
+  changeRate_and_Reward_End();
+  startMainButton.style.display = "none";
+  stopButton.style.display = "none";
+}
+
 // 1초에 한번씩 실행되야 하는 것
 function startFunction() {
   currentDate = new Date();
   start_time = Date.now();
+  changeInfoStart();
+  timerChange();
   studyFunction();
   intervalId = setInterval(function () {
     capture_compareHuman("http://localhost:5000/api/compare-human", baseHuman)
       .then((result) => {
         const compare_result = result.result;
-        var cur_time = Date.now();
-        let timer = time_processing(Math.floor((cur_time - start_time) / 1000));
-        // 여기서 Total Time을 바꿔줍니다.
-        time_set(timer[0], timer[1], timer[2]);
+
         if (compare_result === "정상") {
           sameHuman = true;
         } else {
@@ -195,10 +304,19 @@ function startFunction() {
       .catch((error) => {
         console.error(error);
       });
-  }, 1000);
+  }, 15000);
   if (video.paused) {
     video.play();
   }
+}
+
+function timerChange() {
+  interval1Id = setInterval(function () {
+    var cur_time = Date.now();
+    let timer = time_processing(Math.floor((cur_time - start_time) / 1000));
+    // 여기서 Total Time을 바꿔줍니다.
+    time_set(totalTime, "totalTime", timer[0], timer[1], timer[2]);
+  }, 1000);
 }
 
 function studyFunction() {
@@ -209,73 +327,92 @@ function studyFunction() {
         check3Num++;
         console.log("공부중 : " + compare_result);
         // 같은 사람이면서 공부 하고 있음
-        if (compare_result == "0" && sameHuman) {
+        if (compare_result == "concentrating" && sameHuman) {
           normal++;
+          totalStudyTimeNum++;
         }
-        if (check3Num % 5 == 0) {
-          // 그래프 바꿔주기
-          changeGraph();
-
-          if (normal > 2) {
-            totalReward += (normal - 2) * 10;
+        if (check3Num % 4 == 0) {
+          // 1분마다 보상 증정, 이 시간대의 공부 %가 50% 이상이라면 보상 증정
+          // 1분마다 currentMinute을 증가시킴.
+          if (normal >= 2) {
+            totalReward += (normal - 1) * 100;
             total_normal++;
           } else {
             total_fail++;
           }
+          console.log("normal : " + normal);
+          console.log("totalReward : " + totalReward);
+          console.log("curent Rate : " + currentRate);
+          currentRate = normal * 25;
+          rateList.push((currentRate / 100, currentMinute));
+          chartUpdate(rateList);
+          currentMinute++;
           // maxRate 설정
-          if (maxRate < normal * 20) {
-            maxRate = normal * 20;
+          if (maxRate < currentRate) {
+            maxRate = currentRate;
           }
-          if (minRate > normal * 20) {
-            minRate = normal * 20;
+          if (minRate > currentRate) {
+            minRate = currentRate;
           }
           normal = 0;
+          currentMinute++;
+
+          // 10분이 지나면, 측정 종료
+          if (currentMinute == 10) {
+            stopFunction();
+          }
         }
+        changeGraph();
       }
     );
-  }, 3000);
+  }, 15000);
 }
 
 function changeInfoStart() {
   let currentDate = new Date();
   dateInfo.innerHTML =
     `<h1 class="text-pop-small", id="dateInfo">` +
-    currentDate.getDate() +
+    currentDate.getFullYear() +
     `:` +
     (currentDate.getMonth() + 1) +
     `:` +
-    currentDate.getFullYear() +
+    currentDate.getDate() +
     `</h1>`;
 
   nameInfo.innerHTML =
-    `<h1 class="text-pop-small", id="nameInfo">` + input_name.value + `</h1>`;
-  startTimeInfo.innerHTML =
-    `<h1 class="text-pop-small", id="startTimeInfo">` +
-    cuurentDate.getHours() +
-    `:` +
-    currentDate.getMinutes() +
-    `:` +
-    currentDate.getSeconds() +
-    `</h1>`;
+    `<h1 class="text-pop-small", id="nameInfo">` + "유저" + `</h1>`;
+
+  time_set_small(
+    startTimeInfo,
+    "startTimeInfo",
+    currentDate.getHours(),
+    currentDate.getMinutes(),
+    currentDate.getSeconds()
+  );
 }
 
 function changeInfoEnd() {
   let currentDate = new Date();
-  endTimeInfo.innerHTML =
-    `<h1 class="text-pop-small", id="endTimeInfo">` +
-    currentDate.getHours() +
-    `:` +
-    currentDate.getMinutes() +
-    `:` +
-    currentDate.getSeconds() +
-    `</h1>`;
+  time_set_small(
+    endTimeInfo,
+    "endTimeInfo",
+    currentDate.getHours(),
+    currentDate.getMinutes(),
+    currentDate.getSeconds()
+  );
 }
 
 function changeTimeEnd() {
-  minute = total_normal / 4;
-  second = (total_normal % 4) * 15;
-  endTimeInfo.innerHTML =
-    `<h1 class="text-pop-large", id="endTimeInfo">` +
+  minute = (totalStudyTimeNum * 15) / 60;
+  second = (totalStudyTimeNum * 15) % 60;
+  if (parseInt(second) == 10) {
+    second = "00" + second;
+  }
+  if (parseInt(minute) == 10) {
+    minute = "00" + minute;
+  }
+  totalStudyTime.innerHTML =
+    `<h1 class="text-pop-large", id="totalStudyTime">` +
     minute +
     `:` +
     second +
@@ -284,7 +421,16 @@ function changeTimeEnd() {
 
 function changeRate_and_Reward_End() {
   ttrwd.innerHTML =
-    `<h1 class="text-pop-large", id="endTimeInfo">` + totalReward + `</h1>`;
+    `<h3 class="text-pop-large", id="totalReward">` + totalReward + `</h3>`;
+  let averageRate = (totalStudyTimeNum * 15) / check1Num;
+  maxStudyRate.innerHTML =
+    `<h3 class="text-pop-large", id="maxStudyRate">` + maxRate + `</h3>`;
+  minStudyRate.innerHTML =
+    `<h3 class="text-pop-large", id="minStudyRate">` + minRate + `</h3>`;
+  averageStudyRate.innerHTML =
+    `<h3 class="text-pop-large", id="averageStudyRate">` +
+    Math.floor(averageRate * 100) +
+    `</h3>`;
 }
 
 function changeGraph() {}

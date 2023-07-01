@@ -91,16 +91,22 @@ def compare_human():
         img2 = Image.open(BytesIO(base64.b64decode(img2)))
         img2 = img2.convert('RGB')
         img2.save("image2.jpg", "JPEG")    
-    models = ["OpenFace"]
+    models = ["SFace"]
     try:
         result = DeepFace.verify(img1_path = "image1.jpg",
                                  img2_path="base_face_img.jpg",  # 2번 이미지
                                  model_name=models[0],  # SFace 사용
-                                 distance_metric="euclidean_l2",
-                                 enforce_detection=False)
-        same_people = result['verified']
+                                 distance_metric="cosine",
+                                 enforce_detection=True)
+        
+        threshHold = 0.7
+        print(result)
+        
+        if result['distance'] < 0.7:
+            state = '정상'
+        else:
+            state = '다른 사람'
 
-        state = '정상' if same_people else '다른 사람'
     except ValueError as e:
 
         if 'Face' in e.args[0]:

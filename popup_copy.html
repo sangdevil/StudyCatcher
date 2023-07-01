@@ -56,35 +56,46 @@
                   style="margin-top: 0%; margin-bottom: 0%"
                 >
                   <div class="col-md-2 text-center">
-                    <h1 class="text-pop-small">----.--.--</h1>
+                    <h1 class="text-pop-small" id="dateInfo">----.--.--</h1>
                   </div>
                   <div class="col-md-2 text-center">
-                    <h1 class="text-pop-small">---</h1>
+                    <h1 class="text-pop-small" id="nameInfo">---</h1>
                   </div>
                   <div class="col-md-2 text-center">
-                    <h1 class="text-pop-small">--.--.--</h1>
+                    <h1 class="text-pop-small" id="startTimeInfo">--.--.--</h1>
                   </div>
                   <div class="col-md-2 text-center">
-                    <h1 class="text-pop-small">--.--.--</h1>
+                    <h1 class="text-pop-small" id="endTimeInfo">--.--.--</h1>
                   </div>
                 </div>
-                <br /><br />
+                <br />
                 <div class="row justify-content-center">
-                  <div class="col-lg-4">
+                  <div class="col-lg-3">
+                    <div class="data-container"></div>
+                  </div>
+                  <div class="col-lg-3">
+                    <button
+                      class="custom-btn custom-btn-start"
+                      id="button-start-main"
+                    ></button>
                     <h3
-                      class="text-pop-large"
-                      style="text-align: center; margin-bottom: 30px"
+                      class="text-pop"
+                      style="text-align: center; margin-right: 10px"
                     >
-                      Face Registration
+                      학습 시작
                     </h3>
                   </div>
-                  <div class="col-lg-4">
+                  <div class="col-lg-3">
                     <button
-                      class="custom-btn custom-btn-text"
-                      id="button-register"
+                      class="custom-btn custom-btn-stop"
+                      id="button-stop"
+                    ></button>
+                    <h3
+                      class="text-pop"
+                      style="text-align: center; margin-right: 10px"
                     >
-                      등록
-                    </button>
+                      학습 종료
+                    </h3>
                   </div>
                 </div>
               </div>
@@ -125,19 +136,31 @@
                       <div class="row justify-content-between">
                         <div class="col-lg-3">
                           <h3 class="text-pop-small-rate">Max</h3>
-                          <h3 class="text-pop-large-rate" style="color: green">
+                          <h3
+                            class="text-pop-large-rate"
+                            style="color: green"
+                            id="maxStudyRate"
+                          >
                             %
                           </h3>
                         </div>
                         <div class="col-lg-3">
                           <h3 class="text-pop-small-rate">Min</h3>
-                          <h3 class="text-pop-large-rate" style="color: red">
+                          <h3
+                            class="text-pop-large-rate"
+                            style="color: red"
+                            id="minStudyRate"
+                          >
                             %
                           </h3>
                         </div>
                         <div class="col-lg-3">
                           <h3 class="text-pop-small-rate">Average</h3>
-                          <h3 class="text-pop-large-rate" style="color: red">
+                          <h3
+                            class="text-pop-large-rate"
+                            style="color: red"
+                            id="averageStudyRate"
+                          >
                             %
                           </h3>
                         </div>
@@ -147,11 +170,11 @@
                 </div>
 
                 <div class="col-lg-3">
-                  <h1 class="text-pop-small">Reward</h1>
+                  <h1 class="text-pop-small" id="reward">Reward</h1>
                   <div class="custom-text-box-small">
                     <div class="row justify-content-center">
                       <div class="col">
-                        <h3>0</h3>
+                        <h1 class="text-pop-large" id="totalreward">0</h1>
                       </div>
                     </div>
                   </div>

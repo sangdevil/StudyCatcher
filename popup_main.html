@@ -1,45 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Study Catcher</title>
+    <link rel="stylesheet" href="./css/popup_style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <title>Study Catcher</title>
-  <link rel="stylesheet" href="./css/popup_style.css" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-
-<body>
-  <div id="pop-ready">
-    <div class="container-fluid" style="width: 100%; height: 100%">
-      <br />
-      <div class="row justify-content-center">
-        <div class="col-md-5">
-          <div class="demo-container">
-            <div class="row" id="row1">
-              <div class="col">
-                <div class="video-container">
-                  <!-- Your webcam video goes here -->
-                  <video class="video" id="video_ready" autoplay></video>
+  <body>
+    <div id="pop-ready">
+      <div class="container-fluid" style="width: 100%; height: 100%">
+        <br />
+        <div class="row justify-content-center">
+          <div class="col-md-5">
+            <div class="demo-container">
+              <div class="row" id="row1">
+                <div class="col">
+                  <div class="video-container">
+                    <!-- Your webcam video goes here -->
+                    <video class="video" id="video_ready" autoplay></video>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div class="container" id="studentInfo">
-              <div class="row justify-content-center" style="margin-top: 0%; margin-bottom: 0%">
-                <div class="col-md-2 text-center">
-                  <h1 class="text-pop-small" style="color: gray">Date</h1>
+              <div class="container" id="studentInfo">
+                <div
+                  class="row justify-content-center"
+                  style="margin-top: 0%; margin-bottom: 0%"
+                >
+                  <div class="col-md-2 text-center">
+                    <h1 class="text-pop-small" style="color: gray">Date</h1>
+                  </div>
+                  <div class="col-md-2 text-center">
+                    <h1 class="text-pop-small" style="color: gray">Name</h1>
+                  </div>
+                  <div class="col-md-2 text-center">
+                    <h1 class="text-pop-small" style="color: gray">Start</h1>
+                  </div>
+                  <div class="col-md-2 text-center">
+                    <h1 class="text-pop-small" style="color: gray">Finish</h1>
+                  </div>
                 </div>
-                <div class="col-md-2 text-center">
-                  <h1 class="text-pop-small" style="color: gray">Name</h1>
-                </div>
-                <div class="col-md-2 text-center">
-                  <h1 class="text-pop-small" style="color: gray">Start</h1>
-                </div>
-                <div class="col-md-2 text-center">
-                  <h1 class="text-pop-small" style="color: gray">Finish</h1>
-                </div>
-              </div>
-              <hr style="
+                <hr
+                  style="
                     color: gray;
                     background-color: gray;
                     height: 2px;
@@ -47,105 +49,140 @@
                     margin-right: 17%;
                     margin-top: 0%;
                     margin-bottom: 0%;
-                  " />
-              <br />
-              <div class="row justify-content-center" style="margin-top: 0%; margin-bottom: 0%">
-                <div class="col-md-2 text-center">
-                  <h1 class="text-pop-small" id="dateInfo">----.--.--</h1>
+                  "
+                />
+                <br />
+                <div
+                  class="row justify-content-center"
+                  style="margin-top: 0%; margin-bottom: 0%"
+                >
+                  <div class="col-md-2 text-center">
+                    <h1 class="text-pop-small" id="dateInfo">----.--.--</h1>
+                  </div>
+                  <div class="col-md-2 text-center">
+                    <h1 class="text-pop-small" id="nameInfo">---</h1>
+                  </div>
+                  <div class="col-md-2 text-center">
+                    <h1 class="text-pop-small" id="startTimeInfo">--.--.--</h1>
+                  </div>
+                  <div class="col-md-2 text-center">
+                    <h1 class="text-pop-small" id="endTimeInfo">--.--.--</h1>
+                  </div>
                 </div>
-                <div class="col-md-2 text-center">
-                  <h1 class="text-pop-small" id="nameInfo">---</h1>
-                </div>
-                <div class="col-md-2 text-center">
-                  <h1 class="text-pop-small" id="startTimeInfo">--.--.--</h1>
-                </div>
-                <div class="col-md-2 text-center">
-                  <h1 class="text-pop-small" id="endTimeInfo">--.--.--</h1>
-                </div>
-              </div>
-              <br /><br />
-              <div class="row justify-content-center">
-                <div class="col-lg-3">
-                  <div class="data-container"></div>
-                </div>
-                <div class="col-lg-3">
-                  <button class="custom-btn custom-btn-start" id="button-start-main"></button>
-                  <h3 class="text-pop" style="text-align: center; margin-right: 10px">
-                    학습 시작
-                  </h3>
-                </div>
-                <div class="col-lg-3">
-                  <button class="custom-btn custom-btn-stop" id="button-stop"></button>
-                  <h3 class="text-pop" style="text-align: center; margin-right: 10px">
-                    학습 종료
-                  </h3>
+                <br /><br />
+                <div class="row justify-content-center">
+                  <div class="col-lg-3">
+                    <img class="img-container-custom" id="dynamic-image" />
+                    <h3
+                      class="text-pop"
+                      style="text-align: center; margin-right: 10px"
+                    >
+                      내 얼굴
+                    </h3>
+                  </div>
+                  <div class="col-lg-3">
+                    <button
+                      class="custom-btn custom-btn-start"
+                      id="button-start-main"
+                    ></button>
+                    <h3
+                      class="text-pop"
+                      style="text-align: center; margin-right: 10px"
+                    >
+                      학습 시작
+                    </h3>
+                  </div>
+                  <div class="col-lg-3">
+                    <button
+                      class="custom-btn custom-btn-stop"
+                      id="button-stop"
+                    ></button>
+                    <h3
+                      class="text-pop"
+                      style="text-align: center; margin-right: 10px"
+                    >
+                      학습 종료
+                    </h3>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-        <div class="col-md-7">
-          <br />
-          <div class="container">
-            <div class="row justify-content-center">
-              <div class="col-lg-6">
-                <h1 class="text-pop-small">Total Time</h1>
-                <div class="custom-text-box-small">
-                  <h1 class="text-pop-large" , id="totalTime">00:00</h1>
-                </div>
-              </div>
-              <div class="col-lg-6">
-                <h1 class="text-pop-small">Total Study Time</h1>
-                <div class="custom-text-box-small">
-                  <h1 class="text-pop-large" , id="totalStudyTime">00:00</h1>
-                </div>
-              </div>
-            </div>
+          <div class="col-md-7">
             <br />
-            <div class="row justify-content-center">
-              <div class="col-lg-12">
-                <h1 class="text-pop-small">Total Study Time</h1>
-                <div class="custom-text-box-large">
-                  <canvas id="myChart" width="auto" height="auto"></canvas>
+            <div class="container">
+              <div class="row justify-content-center">
+                <div class="col-lg-6">
+                  <h1 class="text-pop-small">Total Time</h1>
+                  <div class="custom-text-box-small">
+                    <h1 class="text-pop-large" , id="totalTime">00:00</h1>
+                  </div>
+                </div>
+                <div class="col-lg-6">
+                  <h1 class="text-pop-small">Total Study Time</h1>
+                  <div class="custom-text-box-small">
+                    <h1 class="text-pop-large" , id="totalStudyTime">00:00</h1>
+                  </div>
                 </div>
               </div>
-            </div>
-            <br />
-            <div class="row">
-              <div class="col-lg-9">
-                <div class="container">
-                  <h1 class="text-pop-small">Study Rate</h1>
-                  <div class="custom-text-box-items">
-                    <div class="row justify-content-between">
-                      <div class="col-lg-3">
-                        <h3 class="text-pop-small-rate">Max</h3>
-                        <h3 class="text-pop-large-rate" style="color: green">
-                          %
-                        </h3>
-                      </div>
-                      <div class="col-lg-3">
-                        <h3 class="text-pop-small-rate">Min</h3>
-                        <h3 class="text-pop-large-rate" style="color: red">
-                          %
-                        </h3>
-                      </div>
-                      <div class="col-lg-3">
-                        <h3 class="text-pop-small-rate">Average</h3>
-                        <h3 class="text-pop-large-rate" style="color: red">
-                          %
-                        </h3>
+              <br />
+              <div class="row justify-content-center">
+                <div class="col-lg-12">
+                  <h1 class="text-pop-small">Total Study Time</h1>
+                  <div class="custom-text-box-large">
+                    <canvas id="myChart" width="auto" height="auto"></canvas>
+                  </div>
+                </div>
+              </div>
+              <br />
+              <div class="row">
+                <div class="col-lg-9">
+                  <div class="container">
+                    <h1 class="text-pop-small">Study Rate</h1>
+                    <div class="custom-text-box-items">
+                      <div class="row justify-content-between">
+                        <div class="col-lg-3">
+                          <h3 class="text-pop-small-rate">Max</h3>
+                          <h3
+                            class="text-pop-large-rate"
+                            style="color: green"
+                            id="maxStudyRate"
+                          >
+                            %
+                          </h3>
+                        </div>
+                        <div class="col-lg-3">
+                          <h3 class="text-pop-small-rate">Min</h3>
+                          <h3
+                            class="text-pop-large-rate"
+                            style="color: red"
+                            id="minStudyRate"
+                          >
+                            %
+                          </h3>
+                        </div>
+                        <div class="col-lg-3">
+                          <h3 class="text-pop-small-rate">Average</h3>
+                          <h3
+                            class="text-pop-large-rate"
+                            style="color: red"
+                            id="averageStudyRate"
+                          >
+                            %
+                          </h3>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <div class="col-lg-3">
-                <h1 class="text-pop-small" id="reward">Reward</h1>
-                <div class="custom-text-box-small">
-                  <div class="row justify-content-center">
-                    <div class="col">
-                      <h3 id="totalreward">0</h3>
+                <div class="col-lg-3">
+                  <h1 class="text-pop-small" id="reward">Reward</h1>
+                  <div class="custom-text-box-small">
+                    <div class="row justify-content-center">
+                      <div class="col">
+                        <h1 class="text-pop-large" id="totalreward">0</h1>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -155,73 +192,11 @@
         </div>
       </div>
     </div>
-  </div>
 
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-  <script src="./js/popup_main_script.js"></script>
-  <script>
-    var ctx = document.getElementById("myChart").getContext("2d");
-
-    var data = Array(12)
-      .fill(0); // Expanded data to 180 seconds
-
-    var chart = new Chart(ctx, {
-      type: "bar",
-      data: {
-        labels: Array.from(
-          { length: data.length },
-          (_, i) => `${(i + 1) * 15} sec`
-        ), // Changed labels to only show the end of each period
-        datasets: [
-          {
-            label: undefined, // Set label to undefined to hide it
-            data: data,
-            backgroundColor: "purple",
-            barThickness: 10,
-          },
-        ],
-      },
-      options: {
-        scales: {
-          y: {
-            min: 0,
-            max: 1,
-            ticks: {
-              stepSize: 0.2,
-              callback: function (value) {
-                return (value * 100).toFixed(0) + "%";
-              },
-            },
-          },
-        },
-        plugins: {
-          annotation: {
-            annotations: [
-              {
-                type: "line",
-                yMin: 0.6,
-                yMax: 0.6,
-                borderColor: "red",
-                borderWidth: 2,
-              },
-            ],
-          },
-        },
-        plugins: {
-          legend: {
-            labels: {
-              generateLabels: function () {
-                return [];
-              },
-            },
-          },
-        },
-      },
-    });
-  </script>
-</body>
-
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="./js/popup_main_script.js"></script>
+  </body>
 </html>

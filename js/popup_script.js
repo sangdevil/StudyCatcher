@@ -15,7 +15,14 @@ function video_on(id) {
   video = document.getElementById(id);
   if (hasCameraPermission) {
     // Permission already granted, reuse the stream
-    video.srcObject = window.videoStream;
+    navigator.mediaDevices
+      .getUserMedia({ video: true })
+      .then((stream) => {
+        video.srcObject = stream;
+        window.videoStream = stream;
+        sessionStorage.setItem("cameraPermission", true);
+      })
+      .catch((error) => console.log("Error accessing camera", error));
   } else {
     // Request permission and store the flag in sessionStorage
     navigator.mediaDevices
@@ -56,7 +63,7 @@ registerButton.addEventListener("click", function () {
               name: name,
               image: result.img,
             };
-            const popup = window.location.replace("./popup_main.html", "Popup");
+            var popup = window.open("./popup_main.html", "Popup");
             popup.postMessage(message, "*");
           } else {
             // 원하지 않는다면, 다시 함수 재생
