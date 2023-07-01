@@ -90,9 +90,8 @@ def compare_human():
         img2 = img2.split(',')[1]
         img2 = Image.open(BytesIO(base64.b64decode(img2)))
         img2 = img2.convert('RGB')
-        img2.save("image2.jpg", "JPEG")
-    
-    models = ["SFace"]
+        img2.save("image2.jpg", "JPEG")    
+    models = ["OpenFace"]
     try:
         result = DeepFace.verify(img1_path = "image1.jpg",
                                  img2_path="base_face_img.jpg",  # 2번 이미지
@@ -103,6 +102,7 @@ def compare_human():
 
         state = '정상' if same_people else '다른 사람'
     except ValueError as e:
+
         if 'Face' in e.args[0]:
             state = '얼굴 미감지'
         else:
@@ -115,6 +115,7 @@ def compare_human():
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
     print(response)
     return response
+
 
 
 @app.route('/api/study-human', methods=['POST'])
